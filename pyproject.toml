@@ -1,0 +1,9 @@
+[tool.black]
+line-length = 79
+target-version = ['py39']
+skip-string-normalization = true
+
+[tool.isort]
+py_version=39
+line_length = 79
+known_local_folder = ["posts", "about", "users"]
