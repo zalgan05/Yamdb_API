@@ -113,3 +113,6 @@ AUTH_USER_MODEL = "reviews.User"
 
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+
+# from uuid import uuid4; print(uuid4())
+ADMIN_PANEL_PATH_SUFFIX = "3e66bce6-0379-401f-b608-cdcbf114b74c"
