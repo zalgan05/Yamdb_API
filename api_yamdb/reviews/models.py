@@ -25,6 +25,7 @@ class User(AbstractUser):
     )
 
 
+
 class Category(models.Model):
     """Категория произведения."""
     name = models.CharField(max_length=256, verbose_name="Название")
@@ -68,3 +69,23 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name
+
+class Review(models.Model):
+    text = models.TextField()
+    title = models.ForeignKey(
+        Title,  # Проверить при добавлении модели Title
+        on_delete=models.CASCADE,
+        related_name='reviews',
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+    )
+    score = models.IntegerField(
+        'Оценка произведения',
+        min_value=1,
+        max_value=10
+    )
+    pub_date = models.DateTimeField('Дата добавления', auto_now_add=True)
+
