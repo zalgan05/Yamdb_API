@@ -1,18 +1,21 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from reviews.models import Review
 
 User = get_user_model()
 
+_username_field = serializers.RegexField(
+    r"^[\w.@+-]+",
+    min_length=4,
+    max_length=150,
+)
 
-class UserSerializer(serializers.Serializer):
+
+class UserSignupSerializer(serializers.Serializer):
+    username = _username_field
     email = serializers.EmailField(max_length=254)
-    username = serializers.RegexField(
-        r"^[\w.@+-]+",
-        min_length=4,
-        max_length=150,
-    )
 
     def validate_username(self, value):
         if value == "me":
@@ -34,6 +37,19 @@ class UserSerializer(serializers.Serializer):
                 "Данная комбинация (username, email) конфликтует с "
                 "существующей учётной записью"
             )
+        return super().validate(attrs)
+
+
+class TokenRequestSerializer(serializers.Serializer):
+    username = _username_field
+    confirmation_code = serializers.CharField()
+
+    def validate(self, attrs):
+        uname = attrs["username"]
+        ccode = attrs["confirmation_code"]
+        user = get_object_or_404(User, username=uname)
+        if not user.check_password(ccode):
+            raise serializers.ValidationError("Неправильный код подтверждения")
         return super().validate(attrs)
 
 

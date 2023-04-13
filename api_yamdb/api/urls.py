@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from api.views import ReviewViewSet, signup
+from api.views import ReviewViewSet, jwt_token, signup
 
 API_VERSION = "v1"
 
@@ -12,7 +12,8 @@ router.register(
 
 urlpatterns = [
     path("auth/signup/", signup, name="signup"),
-    path('', include(router.urls)),
+    path("auth/token/", jwt_token, name="jwt_token"),
+    path("", include(router.urls)),
 ]
 
 
