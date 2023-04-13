@@ -26,6 +26,7 @@ class User(AbstractUser):
 
 class Category(models.Model):
     """Категория произведения."""
+
     name = models.CharField(max_length=256, verbose_name="Название")
     slug = models.SlugField(unique=True, max_length=50, verbose_name="Слаг")
 
@@ -35,6 +36,7 @@ class Category(models.Model):
 
 class Genre(models.Model):
     """Жанр произведения."""
+
     name = models.CharField(max_length=256, verbose_name="Название")
     slug = models.SlugField(unique=True, max_length=50, verbose_name="Слаг")
 
@@ -44,16 +46,26 @@ class Genre(models.Model):
 
 class Title(models.Model):
     """Произведение."""
+
     name = models.CharField(max_length=256, verbose_name="Название")
-    year = models.IntegerField(validators=[MaxValueValidator(
-        limit_value=dt.datetime.now().year,
-        message="Год выпуска не может быть больше текущего."), ],
-        verbose_name="Год выпуска")
+    year = models.IntegerField(
+        validators=[
+            MaxValueValidator(
+                limit_value=dt.datetime.now().year,
+                message="Год выпуска не может быть больше текущего.",
+            ),
+        ],
+        verbose_name="Год выпуска",
+    )
     description = models.TextField(blank=True, verbose_name="Описание")
     genre = models.ManyToManyField(Genre, verbose_name="Жанр")
     category = models.ForeignKey(
-        Category, to_field="slug", null=True,
-        on_delete=models.SET_NULL, verbose_name="Категория")
+        Category,
+        to_field="slug",
+        null=True,
+        on_delete=models.SET_NULL,
+        verbose_name="Категория",
+    )
 
     class Meta:
         default_related_name = "titles"
@@ -86,7 +98,6 @@ class Review(models.Model):
         validators=[
             MaxValueValidator(10),
             MinValueValidator(1),
-        ]
+        ],
     )
     pub_date = models.DateTimeField('Дата добавления', auto_now_add=True)
-

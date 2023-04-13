@@ -1,11 +1,29 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
+from rest_framework.decorators import api_view
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
+
+from .helpers_auth import send_signup_letter
+from .permissions import IsAuthorOrModeratorOrAdminOrReadOnly
+from .serializers import ReviewSerializer, UserSerializer
 from reviews.models import Title
 
-from .permissions import IsAuthorOrModeratorOrAdminOrReadOnly
-from .serializers import ReviewSerializer
+User = get_user_model()
+
+
+@api_view(['POST'])
+def signup(request):
+    serializer = UserSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    user, _ = User.objects.get_or_create(
+        username=serializer.data["username"],
+        email=serializer.data["email"],
+    )
+    send_signup_letter(user)
+    return Response()
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -15,7 +33,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (
-        IsAuthenticatedOrReadOnly, IsAuthorOrModeratorOrAdminOrReadOnly
+        IsAuthenticatedOrReadOnly,
+        IsAuthorOrModeratorOrAdminOrReadOnly,
     )
 
     def get_queryset(self):
