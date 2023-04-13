@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, filters
-from rest_framework.decorators import api_view
+from rest_framework import filters, viewsets
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from .helpers_auth import get_jwt_token, send_signup_letter
@@ -24,6 +24,7 @@ User = get_user_model()
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def signup(request):
     serializer = UserSignupSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -36,12 +37,11 @@ def signup(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def jwt_token(request):
     serializer = TokenRequestSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)  # <- проверяет confirmation_code
     user = User.objects.get(username=serializer.data["username"])
-    user.role = User.Role.USER
-    print(User.Role.USER)
     token = get_jwt_token(user)
     return Response({"token": token})
 
