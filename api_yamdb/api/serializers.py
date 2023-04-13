@@ -1,6 +1,7 @@
-from reviews.models import Review
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
+from reviews.models import Review
 
 User = get_user_model()
 
