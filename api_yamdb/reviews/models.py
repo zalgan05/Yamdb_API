@@ -1,10 +1,9 @@
-from django.contrib.auth.models import AbstractUser
-from django.db import models
-from django.db.models import Avg
-from django.core.validators import MaxValueValidator
-
 import datetime as dt
 
+from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from django.db.models import Avg
 
 
 class User(AbstractUser):
@@ -23,7 +22,6 @@ class User(AbstractUser):
         choices=Role.choices,
         default=Role.USER,
     )
-
 
 
 class Category(models.Model):
@@ -50,7 +48,7 @@ class Title(models.Model):
     year = models.IntegerField(validators=[MaxValueValidator(
         limit_value=dt.datetime.now().year,
         message="Год выпуска не может быть больше текущего."), ],
-                               verbose_name="Год выпуска")
+        verbose_name="Год выпуска")
     description = models.TextField(blank=True, verbose_name="Описание")
     genre = models.ManyToManyField(Genre, verbose_name="Жанр")
     category = models.ForeignKey(
@@ -70,10 +68,11 @@ class Title(models.Model):
     def __str__(self):
         return self.name
 
+
 class Review(models.Model):
     text = models.TextField()
     title = models.ForeignKey(
-        Title,  # Проверить при добавлении модели Title
+        Title,
         on_delete=models.CASCADE,
         related_name='reviews',
     )
@@ -84,8 +83,10 @@ class Review(models.Model):
     )
     score = models.IntegerField(
         'Оценка произведения',
-        min_value=1,
-        max_value=10
+        validators=[
+            MaxValueValidator(10),
+            MinValueValidator(1),
+        ]
     )
     pub_date = models.DateTimeField('Дата добавления', auto_now_add=True)
 
