@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "reviews",
     "api",
+    "django_filters",  # installed django-filter-23.1
 ]
 
 MIDDLEWARE = [
