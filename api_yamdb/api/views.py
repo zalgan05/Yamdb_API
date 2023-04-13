@@ -1,19 +1,24 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets, filters
 from rest_framework.decorators import api_view
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from .helpers_auth import get_jwt_token, send_signup_letter
+from .mixins import ListCreateDestroyViewSet
 from .permissions import IsAuthorOrModeratorOrAdminOrReadOnly
 from .serializers import (
+    CategorySerializer,
+    GenreSerializer,
     ReviewSerializer,
+    TitleSerializer,
     TokenRequestSerializer,
     UserSignupSerializer,
 )
-from reviews.models import Title
+from reviews.models import Category, Genre, Title
 
 User = get_user_model()
 
@@ -63,3 +68,33 @@ class ReviewViewSet(viewsets.ModelViewSet):
         if self.request.user.reviews.filter(title=title):
             raise Exception('Можно написать только один отзыв')
         serializer.save(author=self.request.user, title=title)
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    permission_classes = None  # добавить
+    pagination_class = LimitOffsetPagination  # из тестов посмотреть какая
+    # пагинация
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ("category", "genre", "name", "year")
+
+
+class GenreViewSet(ListCreateDestroyViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = None  # добавить
+    pagination_class = LimitOffsetPagination  # из тестов посмотреть какая
+    # пагинация
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("name",)
+
+
+class CategoryViewSet(ListCreateDestroyViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = None  # добавить
+    pagination_class = LimitOffsetPagination  # из тестов посмотреть какая
+    # пагинация
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("name",)
