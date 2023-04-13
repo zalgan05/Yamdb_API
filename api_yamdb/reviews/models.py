@@ -84,7 +84,7 @@ class Title(models.Model):
 class Review(models.Model):
     text = models.TextField()
     title = models.ForeignKey(
-        Title,  # Проверить при добавлении модели Title
+        Title,
         on_delete=models.CASCADE,
         related_name='reviews',
     )
