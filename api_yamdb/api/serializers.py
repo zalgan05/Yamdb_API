@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
+from rest_framework.validators import UniqueTogetherValidator
 
 from reviews.models import Category, Genre, Review, Title
 
@@ -63,10 +64,9 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = '__all__'
+        exclude = ('title',)
         read_only_fields = (
             'author',
-            'title',
         )
 
 
@@ -88,14 +88,13 @@ class TitleSerializer(serializers.ModelSerializer):
         model = Title
 
 
-class GenreSerializer:
+class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         fields = "__all__"
         model = Genre
 
 
-class CategorySerializer:
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         fields = "__all__"
         model = Category
-

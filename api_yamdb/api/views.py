@@ -1,23 +1,19 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
+from rest_framework import filters, viewsets, serializers
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import (LimitOffsetPagination,
+                                       PageNumberPagination)
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from .helpers_auth import get_jwt_token, send_signup_letter
 from .mixins import ListCreateDestroyViewSet
 from .permissions import IsAuthorOrModeratorOrAdminOrReadOnly
-from .serializers import (
-    CategorySerializer,
-    GenreSerializer,
-    ReviewSerializer,
-    TitleSerializer,
-    TokenRequestSerializer,
-    UserSignupSerializer,
-)
+from .serializers import (CategorySerializer, GenreSerializer,
+                          ReviewSerializer, TitleSerializer,
+                          TokenRequestSerializer, UserSignupSerializer)
 from reviews.models import Category, Genre, Title
 
 User = get_user_model()
@@ -49,13 +45,13 @@ def jwt_token(request):
 class ReviewViewSet(viewsets.ModelViewSet):
     """Обрабатывает запросы GET для всех отзывов, POST - создаёт новый отзыв,
     GET, PATCH, DELETE для одного отзыва по id отзыва."""
-
     serializer_class = ReviewSerializer
-    pagination_class = LimitOffsetPagination
+    pagination_class = PageNumberPagination
     permission_classes = (
         IsAuthenticatedOrReadOnly,
         IsAuthorOrModeratorOrAdminOrReadOnly,
     )
+    http_method_names = ['get', 'post', 'patch', 'delete']  # Убран метод PUT
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -66,14 +62,16 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, id=title_id)
         if self.request.user.reviews.filter(title=title):
-            raise Exception('Можно написать только один отзыв')
+            raise serializers.ValidationError(
+                'Можно написать только один отзыв'
+            )
         serializer.save(author=self.request.user, title=title)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    permission_classes = None  # добавить
+    permission_classes = (IsAuthenticatedOrReadOnly,)  # добавить
     pagination_class = LimitOffsetPagination  # из тестов посмотреть какая
     # пагинация
     filter_backends = (DjangoFilterBackend,)
@@ -83,7 +81,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 class GenreViewSet(ListCreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = None  # добавить
+    permission_classes = (IsAuthenticatedOrReadOnly,)  # добавить
     pagination_class = LimitOffsetPagination  # из тестов посмотреть какая
     # пагинация
     filter_backends = (filters.SearchFilter,)
@@ -93,7 +91,7 @@ class GenreViewSet(ListCreateDestroyViewSet):
 class CategoryViewSet(ListCreateDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = None  # добавить
+    permission_classes = (IsAuthenticatedOrReadOnly,)  # добавить
     pagination_class = LimitOffsetPagination  # из тестов посмотреть какая
     # пагинация
     filter_backends = (filters.SearchFilter,)
