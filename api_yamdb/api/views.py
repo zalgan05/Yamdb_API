@@ -1,16 +1,17 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, viewsets, serializers
+from rest_framework import filters, mixins, serializers, viewsets
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.pagination import (LimitOffsetPagination,
-                                       PageNumberPagination)
+from rest_framework.pagination import (
+    LimitOffsetPagination,
+    PageNumberPagination,
+)
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from .helpers_auth import get_jwt_token, send_signup_letter
 from .mixins import ListCreateDestroyViewSet
-
 from .permissions import (
     IsAdmin,
     IsAnyone,
@@ -22,6 +23,7 @@ from .permissions import (
 )
 from .serializers import (
     CategorySerializer,
+    CommentSerializer,
     GenreSerializer,
     ReviewSerializer,
     TitleSerializer,
@@ -29,7 +31,7 @@ from .serializers import (
     UserCreateSerializer,
     UserSignupSerializer,
 )
-from reviews.models import Category, Genre, Title
+from reviews.models import Category, Genre, Review, Title
 
 User = get_user_model()
 
@@ -71,6 +73,7 @@ class UsersAdminViewSet(
 class ReviewViewSet(viewsets.ModelViewSet):
     """Обрабатывает запросы GET для всех отзывов, POST - создаёт новый отзыв,
     GET, PATCH, DELETE для одного отзыва по id отзыва."""
+
     serializer_class = ReviewSerializer
     pagination_class = PageNumberPagination
     permission_classes = (
@@ -122,3 +125,26 @@ class CategoryViewSet(ListCreateDestroyViewSet):
     # пагинация
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    """Обрабатывает запросы GET для получения списка всех комментариев
+    отзыва с id=review_id, POST создаёт новый комментарий,
+    GET, PATCH, DELETE для одного комментария по id отзыва с id=review_id."""
+
+    permission_classes = (
+        IsAuthenticatedOrReadOnly,
+        IsAuthorOrModeratorOrAdminOrReadOnly,
+    )
+    serializer_class = CommentSerializer
+    pagination_class = PageNumberPagination
+
+    def perform_create(self, serializer):
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Review, id=review_id)
+        serializer.save(author=self.request.user, review=review)
+
+    def get_queryset(self):
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Review, id=review_id)
+        return review.comments.all()
