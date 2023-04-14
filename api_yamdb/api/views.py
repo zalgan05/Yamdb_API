@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
+from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
@@ -9,13 +9,21 @@ from rest_framework.response import Response
 
 from .helpers_auth import get_jwt_token, send_signup_letter
 from .mixins import ListCreateDestroyViewSet
-from .permissions import IsAuthorOrModeratorOrAdminOrReadOnly
+from .permissions import (
+    IsAdmin,
+    IsAnyone,
+    IsAuthor,
+    IsAuthorOrModeratorOrAdminOrReadOnly,
+    IsModerator,
+    IsUser,
+)
 from .serializers import (
     CategorySerializer,
     GenreSerializer,
     ReviewSerializer,
     TitleSerializer,
     TokenRequestSerializer,
+    UserCreateSerializer,
     UserSignupSerializer,
 )
 from reviews.models import Category, Genre, Title
@@ -33,7 +41,7 @@ def signup(request):
         email=serializer.data["email"],
     )
     send_signup_letter(user)
-    return Response()
+    return Response(request.data)
 
 
 @api_view(['POST'])
@@ -44,6 +52,17 @@ def jwt_token(request):
     user = User.objects.get(username=serializer.data["username"])
     token = get_jwt_token(user)
     return Response({"token": token})
+
+
+class UsersAdminViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet,
+):
+    permission_classes = (IsAdmin,)
+    queryset = User.objects.all()
+    serializer_class = UserCreateSerializer
+    pagination_class = LimitOffsetPagination
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

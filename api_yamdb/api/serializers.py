@@ -7,6 +7,7 @@ from reviews.models import Category, Genre, Review, Title
 
 User = get_user_model()
 
+
 _username_field = serializers.RegexField(
     r"^[\w.@+-]+",
     min_length=4,
@@ -39,6 +40,19 @@ class UserSignupSerializer(serializers.Serializer):
                 "существующей учётной записью"
             )
         return super().validate(attrs)
+
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "bio",
+            "role",
+        ]
 
 
 class TokenRequestSerializer(serializers.Serializer):
@@ -98,4 +112,3 @@ class CategorySerializer:
     class Meta:
         fields = "__all__"
         model = Category
-
