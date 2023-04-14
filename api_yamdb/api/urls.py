@@ -3,11 +3,11 @@ from rest_framework.routers import DefaultRouter
 
 from api.views import (
     CategoryViewSet,
+    CommentViewSet,
     GenreViewSet,
     ReviewViewSet,
     TitleViewSet,
     UsersAdminViewSet,
-    CommentViewSet,
     jwt_token,
     signup,
 )
@@ -25,7 +25,7 @@ router.register(
 router.register(
     r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
     CommentViewSet,
-    basename='comments'
+    basename='comments',
 )
 
 urlpatterns = [
