@@ -72,6 +72,19 @@ class UsersAdminViewSet(
     pagination_class = LimitOffsetPagination
 
 
+class SingleUsersAdminViewSet(
+    mixins.UpdateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    permission_classes = (IsAdmin,)
+    queryset = User.objects.all()
+    serializer_class = UserCreateSerializer
+    lookup_field = "username"
+    lookup_value_regex = r"[\w.@+-]+"
+
+
 class ReviewViewSet(viewsets.ModelViewSet):
     """Обрабатывает запросы GET для всех отзывов, POST - создаёт новый отзыв,
     GET, PATCH, DELETE для одного отзыва по id отзыва."""

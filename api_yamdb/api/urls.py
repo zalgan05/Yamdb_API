@@ -6,6 +6,7 @@ from api.views import (
     CommentViewSet,
     GenreViewSet,
     ReviewViewSet,
+    SingleUsersAdminViewSet,
     TitleViewSet,
     UsersAdminViewSet,
     jwt_token,
@@ -15,6 +16,7 @@ from api.views import (
 API_VERSION = "v1"
 
 router = DefaultRouter()
+router.register("users", SingleUsersAdminViewSet)
 router.register("users", UsersAdminViewSet)
 router.register("categories", CategoryViewSet)
 router.register("genres", GenreViewSet)
