@@ -56,8 +56,7 @@ class IsAdmin(permissions.BasePermission):
 
 class IsAuthorOrModeratorOrAdminOrReadOnly(permissions.BasePermission):
     """Действие с объектом разрешены только для автора объекта,
-    администратора и модератора."""
-
+    администратора и модератора"""
     message = 'Вам недоступно это действие'
 
     def has_object_permission(self, request, view, obj):
