@@ -16,6 +16,7 @@ from .permissions import (
     IsAuthorOrModeratorOrAdminOrReadOnly,
     IsModerator,
     IsUser,
+    ReadOnly,
 )
 from .serializers import (
     CategorySerializer,
@@ -92,7 +93,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    permission_classes = None  # добавить
+    permission_classes = [ReadOnly | IsAdmin]
     pagination_class = LimitOffsetPagination  # из тестов посмотреть какая
     # пагинация
     filter_backends = (DjangoFilterBackend,)
@@ -102,7 +103,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 class GenreViewSet(ListCreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = None  # добавить
+    permission_classes = [ReadOnly | IsAdmin]
     pagination_class = LimitOffsetPagination  # из тестов посмотреть какая
     # пагинация
     filter_backends = (filters.SearchFilter,)
@@ -112,7 +113,7 @@ class GenreViewSet(ListCreateDestroyViewSet):
 class CategoryViewSet(ListCreateDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = None  # добавить
+    permission_classes = [ReadOnly | IsAdmin]
     pagination_class = LimitOffsetPagination  # из тестов посмотреть какая
     # пагинация
     filter_backends = (filters.SearchFilter,)
