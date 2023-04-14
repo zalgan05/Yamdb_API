@@ -1,14 +1,16 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, viewsets
+from rest_framework import filters, mixins, viewsets, serializers
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import (LimitOffsetPagination,
+                                       PageNumberPagination)
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from .helpers_auth import get_jwt_token, send_signup_letter
 from .mixins import ListCreateDestroyViewSet
+
 from .permissions import (
     IsAdmin,
     IsAnyone,
@@ -69,13 +71,13 @@ class UsersAdminViewSet(
 class ReviewViewSet(viewsets.ModelViewSet):
     """Обрабатывает запросы GET для всех отзывов, POST - создаёт новый отзыв,
     GET, PATCH, DELETE для одного отзыва по id отзыва."""
-
     serializer_class = ReviewSerializer
-    pagination_class = LimitOffsetPagination
+    pagination_class = PageNumberPagination
     permission_classes = (
         IsAuthenticatedOrReadOnly,
         IsAuthorOrModeratorOrAdminOrReadOnly,
     )
+    http_method_names = ['get', 'post', 'patch', 'delete']  # Убран метод PUT
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -86,7 +88,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, id=title_id)
         if self.request.user.reviews.filter(title=title):
-            raise Exception('Можно написать только один отзыв')
+            raise serializers.ValidationError(
+                'Можно написать только один отзыв'
+            )
         serializer.save(author=self.request.user, title=title)
 
 

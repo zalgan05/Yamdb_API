@@ -101,3 +101,12 @@ class Review(models.Model):
         ],
     )
     pub_date = models.DateTimeField('Дата добавления', auto_now_add=True)
+
+    class Meta:
+        ordering = ('-pub_date',)  # Добавлено для корректной пагинации
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'author'],  # Один пользователь - один отзыв
+                name='unique_review',
+            )
+        ]

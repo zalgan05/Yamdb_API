@@ -87,10 +87,9 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = '__all__'
+        exclude = ('title',)
         read_only_fields = (
             'author',
-            'title',
         )
 
 
