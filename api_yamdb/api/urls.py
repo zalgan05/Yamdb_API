@@ -6,6 +6,7 @@ from api.views import (
     GenreViewSet,
     ReviewViewSet,
     TitleViewSet,
+    UsersAdminViewSet,
     jwt_token,
     signup,
 )
@@ -13,6 +14,7 @@ from api.views import (
 API_VERSION = "v1"
 
 router = DefaultRouter()
+router.register("users", UsersAdminViewSet)
 router.register("categories", CategoryViewSet)
 router.register("genres", GenreViewSet)  # delete запрос переделать
 router.register("titles", TitleViewSet)  # delete запрос переделать

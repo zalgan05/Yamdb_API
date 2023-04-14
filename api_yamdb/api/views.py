@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets, serializers
+from rest_framework import filters, mixins, viewsets, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.pagination import (LimitOffsetPagination,
                                        PageNumberPagination)
@@ -10,10 +10,25 @@ from rest_framework.response import Response
 
 from .helpers_auth import get_jwt_token, send_signup_letter
 from .mixins import ListCreateDestroyViewSet
-from .permissions import IsAuthorOrModeratorOrAdminOrReadOnly
-from .serializers import (CategorySerializer, GenreSerializer,
-                          ReviewSerializer, TitleSerializer,
-                          TokenRequestSerializer, UserSignupSerializer)
+
+from .permissions import (
+    IsAdmin,
+    IsAnyone,
+    IsAuthor,
+    IsAuthorOrModeratorOrAdminOrReadOnly,
+    IsModerator,
+    IsUser,
+    ReadOnly,
+)
+from .serializers import (
+    CategorySerializer,
+    GenreSerializer,
+    ReviewSerializer,
+    TitleSerializer,
+    TokenRequestSerializer,
+    UserCreateSerializer,
+    UserSignupSerializer,
+)
 from reviews.models import Category, Genre, Title
 
 User = get_user_model()
@@ -29,7 +44,7 @@ def signup(request):
         email=serializer.data["email"],
     )
     send_signup_letter(user)
-    return Response()
+    return Response(request.data)
 
 
 @api_view(['POST'])
@@ -40,6 +55,17 @@ def jwt_token(request):
     user = User.objects.get(username=serializer.data["username"])
     token = get_jwt_token(user)
     return Response({"token": token})
+
+
+class UsersAdminViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet,
+):
+    permission_classes = (IsAdmin,)
+    queryset = User.objects.all()
+    serializer_class = UserCreateSerializer
+    pagination_class = LimitOffsetPagination
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -71,7 +97,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)  # добавить
+    permission_classes = [ReadOnly | IsAdmin]
     pagination_class = LimitOffsetPagination  # из тестов посмотреть какая
     # пагинация
     filter_backends = (DjangoFilterBackend,)
@@ -81,7 +107,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 class GenreViewSet(ListCreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)  # добавить
+    permission_classes = [ReadOnly | IsAdmin]
     pagination_class = LimitOffsetPagination  # из тестов посмотреть какая
     # пагинация
     filter_backends = (filters.SearchFilter,)
@@ -91,7 +117,7 @@ class GenreViewSet(ListCreateDestroyViewSet):
 class CategoryViewSet(ListCreateDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)  # добавить
+    permission_classes = [ReadOnly | IsAdmin]
     pagination_class = LimitOffsetPagination  # из тестов посмотреть какая
     # пагинация
     filter_backends = (filters.SearchFilter,)

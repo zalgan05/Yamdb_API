@@ -120,7 +120,7 @@ EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
 ADMIN_PANEL_PATH_SUFFIX = "3e66bce6-0379-401f-b608-cdcbf114b74c"
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=20),
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
