@@ -7,6 +7,7 @@ from reviews.models import Category, Genre, Review, Title
 
 User = get_user_model()
 
+
 _username_field = serializers.RegexField(
     r"^[\w.@+-]+",
     min_length=4,
@@ -14,9 +15,29 @@ _username_field = serializers.RegexField(
 )
 
 
-class UserSignupSerializer(serializers.Serializer):
+class TokenRequestSerializer(serializers.Serializer):
+    username = _username_field
+    confirmation_code = serializers.CharField()
+
+    def validate(self, attrs):
+        uname = attrs["username"]
+        ccode = attrs["confirmation_code"]
+        user = get_object_or_404(User, username=uname)
+        if not user.check_password(ccode):
+            raise serializers.ValidationError("Неправильный код подтверждения")
+        return super().validate(attrs)
+
+
+class UserSignupSerializer(serializers.ModelSerializer):
     username = _username_field
     email = serializers.EmailField(max_length=254)
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+        ]
 
     def validate_username(self, value):
         if value == "me":
@@ -41,17 +62,20 @@ class UserSignupSerializer(serializers.Serializer):
         return super().validate(attrs)
 
 
-class TokenRequestSerializer(serializers.Serializer):
-    username = _username_field
-    confirmation_code = serializers.CharField()
+class UserCreateSerializer(UserSignupSerializer):
+    first_name = serializers.CharField(max_length=150)
+    last_name = serializers.CharField(max_length=150)
 
-    def validate(self, attrs):
-        uname = attrs["username"]
-        ccode = attrs["confirmation_code"]
-        user = get_object_or_404(User, username=uname)
-        if not user.check_password(ccode):
-            raise serializers.ValidationError("Неправильный код подтверждения")
-        return super().validate(attrs)
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "bio",
+            "role",
+        ]
 
 
 class ReviewSerializer(serializers.ModelSerializer):
