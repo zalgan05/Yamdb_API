@@ -15,9 +15,29 @@ _username_field = serializers.RegexField(
 )
 
 
-class UserSignupSerializer(serializers.Serializer):
+class TokenRequestSerializer(serializers.Serializer):
+    username = _username_field
+    confirmation_code = serializers.CharField()
+
+    def validate(self, attrs):
+        uname = attrs["username"]
+        ccode = attrs["confirmation_code"]
+        user = get_object_or_404(User, username=uname)
+        if not user.check_password(ccode):
+            raise serializers.ValidationError("Неправильный код подтверждения")
+        return super().validate(attrs)
+
+
+class UserSignupSerializer(serializers.ModelSerializer):
     username = _username_field
     email = serializers.EmailField(max_length=254)
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+        ]
 
     def validate_username(self, value):
         if value == "me":
@@ -42,7 +62,7 @@ class UserSignupSerializer(serializers.Serializer):
         return super().validate(attrs)
 
 
-class UserCreateSerializer(serializers.ModelSerializer):
+class UserCreateSerializer(UserSignupSerializer):
     class Meta:
         model = User
         fields = [
@@ -53,19 +73,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
             "bio",
             "role",
         ]
-
-
-class TokenRequestSerializer(serializers.Serializer):
-    username = _username_field
-    confirmation_code = serializers.CharField()
-
-    def validate(self, attrs):
-        uname = attrs["username"]
-        ccode = attrs["confirmation_code"]
-        user = get_object_or_404(User, username=uname)
-        if not user.check_password(ccode):
-            raise serializers.ValidationError("Неправильный код подтверждения")
-        return super().validate(attrs)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
