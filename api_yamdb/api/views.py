@@ -28,8 +28,9 @@ from .serializers import (
     TokenRequestSerializer,
     UserCreateSerializer,
     UserSignupSerializer,
+    CommentSerializer,
 )
-from reviews.models import Category, Genre, Title
+from reviews.models import Category, Genre, Title, Review
 
 User = get_user_model()
 
@@ -122,3 +123,25 @@ class CategoryViewSet(ListCreateDestroyViewSet):
     # пагинация
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    """Обрабатывает запросы GET для получения списка всех комментариев
+    отзыва с id=review_id, POST создаёт новый комментарий,
+    GET, PATCH, DELETE для одного комментария по id отзыва с id=review_id."""
+    permission_classes = (
+        IsAuthenticatedOrReadOnly,
+        IsAuthorOrModeratorOrAdminOrReadOnly,
+    )
+    serializer_class = CommentSerializer
+    pagination_class = PageNumberPagination
+
+    def perform_create(self, serializer):
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Review, id=review_id)
+        serializer.save(author=self.request.user, review=review)
+
+    def get_queryset(self):
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Review, id=review_id)
+        return review.comments.all()
