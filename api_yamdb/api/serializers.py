@@ -88,14 +88,13 @@ class TitleSerializer(serializers.ModelSerializer):
         model = Title
 
 
-class GenreSerializer:
+class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         fields = "__all__"
         model = Genre
 
 
-class CategorySerializer:
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         fields = "__all__"
         model = Category
-
