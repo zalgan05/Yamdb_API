@@ -9,8 +9,8 @@ from rest_framework.pagination import (
 )
 from rest_framework.permissions import (
     AllowAny,
-    IsAuthenticatedOrReadOnly,
     IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
 )
 from rest_framework.response import Response
 
@@ -18,6 +18,7 @@ from .filter import FilterTitles
 from .helpers_auth import get_jwt_token, send_signup_letter
 from .mixins import ListCreateDestroyViewSet
 from .permissions import (
+    IsAccessingOneself,
     IsAdmin,
     IsAnyone,
     IsAuthor,
@@ -25,7 +26,6 @@ from .permissions import (
     IsModerator,
     IsUser,
     ReadOnly,
-    IsAccessingOneself,
 )
 from .serializers import (
     CategorySerializer,

@@ -7,9 +7,9 @@ from api.views import (
     GenreViewSet,
     ReviewViewSet,
     SingleUsersAdminViewSet,
-    UserSelfViewSet,
     TitleViewSet,
     UsersAdminViewSet,
+    UserSelfViewSet,
     jwt_token,
     signup,
 )
