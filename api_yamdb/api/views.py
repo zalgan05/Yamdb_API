@@ -7,7 +7,11 @@ from rest_framework.pagination import (
     LimitOffsetPagination,
     PageNumberPagination,
 )
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticatedOrReadOnly,
+    IsAuthenticated,
+)
 from rest_framework.response import Response
 
 from .filter import FilterTitles
@@ -21,6 +25,7 @@ from .permissions import (
     IsModerator,
     IsUser,
     ReadOnly,
+    IsAccessingOneself,
 )
 from .serializers import (
     CategorySerializer,
@@ -83,6 +88,20 @@ class SingleUsersAdminViewSet(
     serializer_class = UserCreateSerializer
     lookup_field = "username"
     lookup_value_regex = r"[\w.@+-]+"
+
+
+class UserSelfViewSet(
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserCreateSerializer
+    lookup_field = "_"
+    lookup_field = "me"
+
+    def get_object(self):
+        return self.request.user
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
