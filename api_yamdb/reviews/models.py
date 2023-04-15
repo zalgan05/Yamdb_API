@@ -72,10 +72,10 @@ class Title(models.Model):
 
     @property
     def rating(self):
-        reviews = self.reviews  # получение отзывов по related name - reviews
+        reviews = self.reviews
         if not reviews:
             return None
-        return reviews.aggregate(Avg("score"))
+        return reviews.aggregate(Avg("score"))["score__avg"]
 
     def __str__(self):
         return self.name
