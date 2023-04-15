@@ -32,6 +32,16 @@ class IsUser(permissions.BasePermission):
         )
 
 
+class IsAccessingOneself(permissions.IsAuthenticated):
+    """Пользователь может иметь доступ только к своей собственной записи
+    пользователя"""
+
+    def has_object_permission(self, request, view, obj):
+        if not isinstance(obj, User):
+            return False
+        return request.user.username == obj.username
+
+
 class IsModerator(permissions.BasePermission):
     def has_permission(self, request, view):
         return (

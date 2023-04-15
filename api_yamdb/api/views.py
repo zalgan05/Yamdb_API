@@ -7,13 +7,18 @@ from rest_framework.pagination import (
     LimitOffsetPagination,
     PageNumberPagination,
 )
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 from rest_framework.response import Response
 
 from .filter import FilterTitles
 from .helpers_auth import get_jwt_token, send_signup_letter
 from .mixins import ListCreateDestroyViewSet
 from .permissions import (
+    IsAccessingOneself,
     IsAdmin,
     IsAnyone,
     IsAuthor,
@@ -70,6 +75,37 @@ class UsersAdminViewSet(
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
     pagination_class = LimitOffsetPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("username",)
+
+
+class SingleUsersAdminViewSet(
+    mixins.UpdateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    permission_classes = (IsAdmin,)
+    queryset = User.objects.all()
+    serializer_class = UserCreateSerializer
+    lookup_field = "username"
+    lookup_value_regex = r"[\w.@+-]+"
+
+    http_method_names = ['get', 'post', 'patch', 'delete']
+
+
+class UserSelfViewSet(
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserCreateSerializer
+    lookup_field = "_"
+    lookup_value_regex = "me"
+
+    def get_object(self):
+        return self.request.user
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
