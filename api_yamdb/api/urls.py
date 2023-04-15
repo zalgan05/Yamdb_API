@@ -17,8 +17,8 @@ API_VERSION = "v1"
 router = DefaultRouter()
 router.register("users", UsersAdminViewSet)
 router.register("categories", CategoryViewSet)
-router.register("genres", GenreViewSet)  # delete запрос переделать
-router.register("titles", TitleViewSet)  # delete запрос переделать
+router.register("genres", GenreViewSet)
+router.register("titles", TitleViewSet)
 router.register(
     r'titles/(?P<title_id>\d+)/reviews', ReviewViewSet, basename='reviews'
 )

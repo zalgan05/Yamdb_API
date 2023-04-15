@@ -10,6 +10,7 @@ from rest_framework.pagination import (
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
+from .filter import FilterTitles
 from .helpers_auth import get_jwt_token, send_signup_letter
 from .mixins import ListCreateDestroyViewSet
 from .permissions import (
@@ -25,6 +26,7 @@ from .serializers import (
     CategorySerializer,
     CommentSerializer,
     GenreSerializer,
+    GetTitleSerializer,
     ReviewSerializer,
     TitleSerializer,
     TokenRequestSerializer,
@@ -101,30 +103,34 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     permission_classes = [ReadOnly | IsAdmin]
-    pagination_class = LimitOffsetPagination  # из тестов посмотреть какая
-    # пагинация
+    pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ("category", "genre", "name", "year")
+    filterset_class = FilterTitles
+
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return GetTitleSerializer
+        return TitleSerializer
 
 
 class GenreViewSet(ListCreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [ReadOnly | IsAdmin]
-    pagination_class = LimitOffsetPagination  # из тестов посмотреть какая
-    # пагинация
+    pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
+    lookup_field = "slug"
 
 
 class CategoryViewSet(ListCreateDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [ReadOnly | IsAdmin]
-    pagination_class = LimitOffsetPagination  # из тестов посмотреть какая
-    # пагинация
+    pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
+    lookup_field = "slug"
 
 
 class CommentViewSet(viewsets.ModelViewSet):

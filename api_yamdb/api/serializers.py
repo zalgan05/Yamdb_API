@@ -92,6 +92,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    """Сериализатор для добавления/обновления/удаления произведения."""
+
     genre = SlugRelatedField(
         slug_field="slug", many=True, queryset=Genre.objects.all()
     )
@@ -111,14 +113,39 @@ class TitleSerializer(serializers.ModelSerializer):
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = "__all__"
+        fields = (
+            "name",
+            "slug",
+        )
         model = Genre
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        fields = "__all__"
+        fields = (
+            "name",
+            "slug",
+        )
         model = Category
+
+
+class GetTitleSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения произведения/произведений."""
+
+    genre = GenreSerializer(many=True)
+    category = CategorySerializer()
+
+    class Meta:
+        fields = (
+            "id",
+            "name",
+            "year",
+            "rating",
+            "description",
+            "genre",
+            "category",
+        )  # порядок вывода, как в redoc
+        model = Title
 
 
 class CommentSerializer(serializers.ModelSerializer):
