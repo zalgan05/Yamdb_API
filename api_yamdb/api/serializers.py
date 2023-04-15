@@ -63,8 +63,8 @@ class UserSignupSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(UserSignupSerializer):
-    first_name = serializers.CharField(max_length=150)
-    last_name = serializers.CharField(max_length=150)
+    first_name = serializers.CharField(max_length=150, required=False)
+    last_name = serializers.CharField(max_length=150, required=False)
 
     class Meta:
         model = User
