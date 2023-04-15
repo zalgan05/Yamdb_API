@@ -49,17 +49,63 @@ class UserSignupSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         uname = attrs["username"]
         email = attrs["email"]
-        if (
+        uname_exists = (
             User.objects.filter(username=uname).exclude(email=email).exists()
-            or User.objects.filter(email=email)
-            .exclude(username=uname)
-            .exists()
-        ):
+        )
+        email_exists = (
+            User.objects.filter(email=email).exclude(username=uname).exists()
+        )
+        if uname_exists or email_exists:
             raise serializers.ValidationError(
                 "Данная комбинация (username, email) конфликтует с "
                 "существующей учётной записью"
             )
         return super().validate(attrs)
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    username = serializers.RegexField(
+        r"^[\w.@+-]+",
+        min_length=4,
+        max_length=150,
+        required=False,
+    )
+    first_name = serializers.CharField(max_length=150, required=False)
+    last_name = serializers.CharField(max_length=150, required=False)
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "bio",
+            "role",
+        ]
+
+
+class UserMeUpdateSerializer(serializers.ModelSerializer):
+    username = serializers.RegexField(
+        r"^[\w.@+-]+",
+        min_length=4,
+        max_length=150,
+        required=False,
+    )
+    first_name = serializers.CharField(max_length=150, required=False)
+    last_name = serializers.CharField(max_length=150, required=False)
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "bio",
+            "role",
+        ]
+        read_only_fields = ('role',)
 
 
 class UserCreateSerializer(UserSignupSerializer):

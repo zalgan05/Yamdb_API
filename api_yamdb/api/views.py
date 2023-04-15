@@ -37,6 +37,8 @@ from .serializers import (
     TokenRequestSerializer,
     UserCreateSerializer,
     UserSignupSerializer,
+    UserUpdateSerializer,
+    UserMeUpdateSerializer,
 )
 from reviews.models import Category, Genre, Review, Title
 
@@ -87,7 +89,7 @@ class SingleUsersAdminViewSet(
 ):
     permission_classes = (IsAdmin,)
     queryset = User.objects.all()
-    serializer_class = UserCreateSerializer
+    serializer_class = UserUpdateSerializer  # UserCreateSerializer
     lookup_field = "username"
     lookup_value_regex = r"[\w.@+-]+"
 
@@ -100,7 +102,7 @@ class UserSelfViewSet(
     viewsets.GenericViewSet,
 ):
     permission_classes = (IsAuthenticated,)
-    serializer_class = UserCreateSerializer
+    serializer_class = UserMeUpdateSerializer
     lookup_field = "_"
     lookup_value_regex = "me"
 
