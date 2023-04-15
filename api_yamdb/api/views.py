@@ -100,7 +100,7 @@ class UserSelfViewSet(
     permission_classes = (IsAuthenticated,)
     serializer_class = UserCreateSerializer
     lookup_field = "_"
-    lookup_field = "me"
+    lookup_value_regex = "me"
 
     def get_object(self):
         return self.request.user
