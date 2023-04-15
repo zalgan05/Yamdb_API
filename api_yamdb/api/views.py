@@ -75,6 +75,8 @@ class UsersAdminViewSet(
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
     pagination_class = LimitOffsetPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("username",)
 
 
 class SingleUsersAdminViewSet(
