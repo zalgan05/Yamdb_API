@@ -18,13 +18,9 @@ from .filter import FilterTitles
 from .helpers_auth import get_jwt_token, send_signup_letter
 from .mixins import ListCreateDestroyViewSet
 from .permissions import (
-    IsAccessingOneself,
     IsAdmin,
-    IsAnyone,
     IsAuthor,
-    IsAuthorOrModeratorOrAdminOrReadOnly,
     IsModerator,
-    IsUser,
     ReadOnly,
 )
 from .serializers import (
@@ -116,7 +112,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
     permission_classes = (
         IsAuthenticatedOrReadOnly,
-        IsAuthorOrModeratorOrAdminOrReadOnly,
+        ReadOnly | IsAuthor | IsModerator | IsAdmin,
     )
     http_method_names = ['get', 'post', 'patch', 'delete']  # Убран метод PUT
 
@@ -176,7 +172,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     permission_classes = (
         IsAuthenticatedOrReadOnly,
-        IsAuthorOrModeratorOrAdminOrReadOnly,
+        ReadOnly | IsAuthor | IsModerator | IsAdmin,
     )
     serializer_class = CommentSerializer
     pagination_class = PageNumberPagination
