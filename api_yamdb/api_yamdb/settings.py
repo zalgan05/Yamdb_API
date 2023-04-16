@@ -23,9 +23,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "reviews",
-    "api",
-    "django_filters",  # installed django-filter-23.1
+    "reviews.apps.ReviewsConfig",
+    "api.apps.ApiConfig",
+    "django_filters",
 ]
 
 MIDDLEWARE = [
