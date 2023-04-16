@@ -5,7 +5,6 @@ from rest_framework.relations import SlugRelatedField
 
 from reviews.models import Category, Comment, Genre, Review, Title
 
-
 UNAME_REGEX = r"^[\w.@+-]+"
 UNAME_MIN_LEN = 4
 UNAME_MAX_LEN = 150
@@ -22,8 +21,16 @@ class MixinUsernameRequired(serializers.Serializer):
         max_length=UNAME_MAX_LEN,
     )
 
+    def validate_username(self, value):
+        if value == "me":
+            raise serializers.ValidationError(
+                "Нельзя выбрать \"me\" в качестве имени пользователя"
+            )  # в принципе, его и так нельзя будет выбрать, т.к. ограничение
+            #    на длину не позволит
+        return value
 
-class MixinUsernameOptional(serializers.Serializer):
+
+class MixinUsernameOptional(MixinUsernameRequired):
     username = serializers.RegexField(
         UNAME_REGEX,
         min_length=UNAME_MIN_LEN,
@@ -79,14 +86,6 @@ class UserSignupSerializer(
             "username",
             "email",
         ]
-
-    def validate_username(self, value):
-        if value == "me":
-            raise serializers.ValidationError(
-                "Нельзя выбрать \"me\" в качестве имени пользователя"
-            )  # в принципе, его и так нельзя будет выбрать, т.к. ограничение
-            #    на длину не позволит
-        return value
 
     def validate(self, attrs):
         uname = attrs["username"]

@@ -36,9 +36,9 @@ from .serializers import (
     TitleSerializer,
     TokenRequestSerializer,
     UserCreateSerializer,
+    UserMeUpdateSerializer,
     UserSignupSerializer,
     UserUpdateSerializer,
-    UserMeUpdateSerializer,
 )
 from reviews.models import Category, Genre, Review, Title
 
