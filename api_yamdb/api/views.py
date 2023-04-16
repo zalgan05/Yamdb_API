@@ -89,7 +89,7 @@ class SingleUsersAdminViewSet(
 ):
     permission_classes = (IsAdmin,)
     queryset = User.objects.all()
-    serializer_class = UserUpdateSerializer  # UserCreateSerializer
+    serializer_class = UserUpdateSerializer
     lookup_field = "username"
     lookup_value_regex = r"[\w.@+-]+"
 
