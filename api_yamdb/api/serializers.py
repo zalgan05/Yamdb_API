@@ -5,18 +5,52 @@ from rest_framework.relations import SlugRelatedField
 
 from reviews.models import Category, Comment, Genre, Review, Title
 
+UNAME_REGEX = r"^[\w.@+-]+"
+UNAME_MIN_LEN = 4
+UNAME_MAX_LEN = 150
+EMAIL_MAX_LEN = 254
+NAMES_MAX_LEN = 150
+
 User = get_user_model()
 
 
-_username_field = serializers.RegexField(
-    r"^[\w.@+-]+",
-    min_length=4,
-    max_length=150,
-)
+class MixinUsernameRequired(serializers.Serializer):
+    username = serializers.RegexField(
+        UNAME_REGEX,
+        min_length=UNAME_MIN_LEN,
+        max_length=UNAME_MAX_LEN,
+    )
+
+    def validate_username(self, value):
+        if value == "me":
+            raise serializers.ValidationError(
+                "Нельзя выбрать \"me\" в качестве имени пользователя"
+            )  # в принципе, его и так нельзя будет выбрать, т.к. ограничение
+            #    на длину не позволит
+        return value
 
 
-class TokenRequestSerializer(serializers.Serializer):
-    username = _username_field
+class MixinUsernameOptional(MixinUsernameRequired):
+    username = serializers.RegexField(
+        UNAME_REGEX,
+        min_length=UNAME_MIN_LEN,
+        max_length=UNAME_MAX_LEN,
+        required=False,
+    )
+
+
+class MixinEmail(serializers.Serializer):
+    email = serializers.EmailField(max_length=EMAIL_MAX_LEN)
+
+
+class MixinNames(serializers.Serializer):
+    first_name = serializers.CharField(
+        max_length=NAMES_MAX_LEN, required=False
+    )
+    last_name = serializers.CharField(max_length=NAMES_MAX_LEN, required=False)
+
+
+class TokenRequestSerializer(MixinUsernameRequired, serializers.Serializer):
     confirmation_code = serializers.CharField()
 
     def validate(self, attrs):
@@ -28,10 +62,24 @@ class TokenRequestSerializer(serializers.Serializer):
         return super().validate(attrs)
 
 
-class UserSignupSerializer(serializers.ModelSerializer):
-    username = _username_field
-    email = serializers.EmailField(max_length=254)
+class BaseUserModelSerializer(
+    MixinEmail, MixinNames, serializers.ModelSerializer
+):
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "bio",
+            "role",
+        ]
 
+
+class UserSignupSerializer(
+    MixinUsernameRequired, MixinEmail, serializers.ModelSerializer
+):
     class Meta:
         model = User
         fields = [
@@ -39,22 +87,16 @@ class UserSignupSerializer(serializers.ModelSerializer):
             "email",
         ]
 
-    def validate_username(self, value):
-        if value == "me":
-            raise serializers.ValidationError(
-                "Нельзя выбрать \"me\" в качестве имени пользователя"
-            )
-        return value
-
     def validate(self, attrs):
         uname = attrs["username"]
         email = attrs["email"]
-        if (
+        uname_exists = (
             User.objects.filter(username=uname).exclude(email=email).exists()
-            or User.objects.filter(email=email)
-            .exclude(username=uname)
-            .exists()
-        ):
+        )
+        email_exists = (
+            User.objects.filter(email=email).exclude(username=uname).exists()
+        )
+        if uname_exists or email_exists:
             raise serializers.ValidationError(
                 "Данная комбинация (username, email) конфликтует с "
                 "существующей учётной записью"
@@ -62,10 +104,27 @@ class UserSignupSerializer(serializers.ModelSerializer):
         return super().validate(attrs)
 
 
-class UserCreateSerializer(UserSignupSerializer):
-    first_name = serializers.CharField(max_length=150, required=False)
-    last_name = serializers.CharField(max_length=150, required=False)
+class UserUpdateSerializer(MixinUsernameOptional, BaseUserModelSerializer):
+    pass
 
+
+class UserMeUpdateSerializer(
+    MixinUsernameOptional, serializers.ModelSerializer
+):
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "bio",
+            "role",
+        ]
+        read_only_fields = ('role',)
+
+
+class UserCreateSerializer(MixinNames, UserSignupSerializer):
     class Meta:
         model = User
         fields = [
