@@ -123,7 +123,7 @@ class UserMeUpdateSerializer(
             "bio",
             "role",
         ]
-        read_only_fields = ("role",)
+        read_only_fields = ["role"]
 
 
 class UserCreateSerializer(MixinNames, UserSignupSerializer):
@@ -148,8 +148,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        exclude = ("title",)
-        read_only_fields = ("author",)
+        exclude = ["title"]
+        read_only_fields = ["author"]
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -163,7 +163,7 @@ class TitleSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = (
+        fields = [
             "id",
             "name",
             "year",
@@ -171,25 +171,25 @@ class TitleSerializer(serializers.ModelSerializer):
             "description",
             "genre",
             "category",
-        )  # порядок вывода, как в redoc
+        ]  # порядок вывода, как в redoc
         model = Title
 
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = (
+        fields = [
             "name",
             "slug",
-        )
+        ]
         model = Genre
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        fields = (
+        fields = [
             "name",
             "slug",
-        )
+        ]
         model = Category
 
 
@@ -200,7 +200,7 @@ class GetTitleSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
 
     class Meta:
-        fields = (
+        fields = [
             "id",
             "name",
             "year",
@@ -208,7 +208,7 @@ class GetTitleSerializer(serializers.ModelSerializer):
             "description",
             "genre",
             "category",
-        )  # порядок вывода, как в redoc
+        ]  # порядок вывода, как в redoc
         model = Title
 
 
@@ -218,6 +218,6 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        exclude = ("review",)
+        exclude = ["review"]
         model = Comment
-        read_only_fields = ("author",)
+        read_only_fields = ["author"]

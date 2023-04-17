@@ -73,12 +73,12 @@ class UsersAdminViewSet(ListCreateViewSet):
     1) GET: получить список всех пользователей
     2) POST: создать нового пользователя, указав ему роль, отличную от USER"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = [IsAdmin]
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
     pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ("username",)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["username"]
 
 
 class SingleUsersAdminViewSet(RetrievUpdateViewSet, DestroyViewSet):
@@ -87,7 +87,7 @@ class SingleUsersAdminViewSet(RetrievUpdateViewSet, DestroyViewSet):
     2) PATCH: изменить в ней что-то
     3) DELETE: удалить её"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = [IsAdmin]
     queryset = User.objects.all()
     serializer_class = UserUpdateSerializer
     lookup_field = "username"
@@ -99,7 +99,7 @@ class UserSelfViewSet(RetrievUpdateViewSet):
     1) GET: получить информацию о своей учётке
     2) PATCH: изменить в ней что-то"""
 
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated]
     serializer_class = UserMeUpdateSerializer
     lookup_field = "_"  # мы не будем его использовать
     lookup_value_regex = "me"  # `/users/me/`
@@ -114,10 +114,10 @@ class ReviewViewSet(AllViewSet):
 
     serializer_class = ReviewSerializer
     pagination_class = PageNumberPagination
-    permission_classes = (
+    permission_classes = [
         IsAuthenticatedOrReadOnly,
         ReadOnly | IsAuthor | IsModerator | IsAdmin,
-    )
+    ]
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
@@ -143,7 +143,7 @@ class TitleViewSet(AllViewSet):
     serializer_class = TitleSerializer
     permission_classes = [ReadOnly | IsAdmin]
     pagination_class = LimitOffsetPagination
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = [DjangoFilterBackend]
     filterset_class = FilterTitles
 
     def get_serializer_class(self):
@@ -159,8 +159,8 @@ class GenreViewSet(ListCreateViewSet, DestroyViewSet):
     serializer_class = GenreSerializer
     permission_classes = [ReadOnly | IsAdmin]
     pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ("name",)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["name"]
     lookup_field = "slug"
 
 
@@ -171,8 +171,8 @@ class CategoryViewSet(ListCreateViewSet, DestroyViewSet):
     serializer_class = CategorySerializer
     permission_classes = [ReadOnly | IsAdmin]
     pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ("name",)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["name"]
     lookup_field = "slug"
 
 
@@ -181,10 +181,10 @@ class CommentViewSet(AllViewSet):
     отзыва с id=review_id, POST создаёт новый комментарий,
     GET, PATCH, DELETE для одного комментария по id отзыва с id=review_id."""
 
-    permission_classes = (
+    permission_classes = [
         IsAuthenticatedOrReadOnly,
         ReadOnly | IsAuthor | IsModerator | IsAdmin,
-    )
+    ]
     serializer_class = CommentSerializer
     pagination_class = PageNumberPagination
 
