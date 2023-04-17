@@ -41,7 +41,7 @@ from reviews.models import Category, Genre, Review, Title
 User = get_user_model()
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([AllowAny])
 def signup(request):
     """Регистрация нового пользователя"""
@@ -56,7 +56,7 @@ def signup(request):
     return Response(request.data)
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([AllowAny])
 def jwt_token(request):
     """Получение JWT-токена"""
@@ -73,12 +73,12 @@ class UsersAdminViewSet(ListCreateViewSet):
     1) GET: получить список всех пользователей
     2) POST: создать нового пользователя, указав ему роль, отличную от USER"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = [IsAdmin]
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
     pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ("username",)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["username"]
 
 
 class SingleUsersAdminViewSet(RetrievUpdateViewSet, DestroyViewSet):
@@ -87,7 +87,7 @@ class SingleUsersAdminViewSet(RetrievUpdateViewSet, DestroyViewSet):
     2) PATCH: изменить в ней что-то
     3) DELETE: удалить её"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = [IsAdmin]
     queryset = User.objects.all()
     serializer_class = UserUpdateSerializer
     lookup_field = "username"
@@ -99,7 +99,7 @@ class UserSelfViewSet(RetrievUpdateViewSet):
     1) GET: получить информацию о своей учётке
     2) PATCH: изменить в ней что-то"""
 
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated]
     serializer_class = UserMeUpdateSerializer
     lookup_field = "_"  # мы не будем его использовать
     lookup_value_regex = "me"  # `/users/me/`
@@ -114,22 +114,22 @@ class ReviewViewSet(AllViewSet):
 
     serializer_class = ReviewSerializer
     pagination_class = PageNumberPagination
-    permission_classes = (
+    permission_classes = [
         IsAuthenticatedOrReadOnly,
         ReadOnly | IsAuthor | IsModerator | IsAdmin,
-    )
+    ]
 
     def get_queryset(self):
-        title_id = self.kwargs.get('title_id')
+        title_id = self.kwargs.get("title_id")
         title = get_object_or_404(Title, id=title_id)
         return title.reviews.all()
 
     def perform_create(self, serializer):
-        title_id = self.kwargs.get('title_id')
+        title_id = self.kwargs.get("title_id")
         title = get_object_or_404(Title, id=title_id)
         if self.request.user.reviews.filter(title=title):
             raise serializers.ValidationError(
-                'Можно написать только один отзыв'
+                "Можно написать только один отзыв"
             )
         serializer.save(author=self.request.user, title=title)
 
@@ -143,11 +143,11 @@ class TitleViewSet(AllViewSet):
     serializer_class = TitleSerializer
     permission_classes = [ReadOnly | IsAdmin]
     pagination_class = LimitOffsetPagination
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = [DjangoFilterBackend]
     filterset_class = FilterTitles
 
     def get_serializer_class(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ["list", "retrieve"]:
             return GetTitleSerializer
         return TitleSerializer
 
@@ -159,8 +159,8 @@ class GenreViewSet(ListCreateViewSet, DestroyViewSet):
     serializer_class = GenreSerializer
     permission_classes = [ReadOnly | IsAdmin]
     pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ("name",)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["name"]
     lookup_field = "slug"
 
 
@@ -171,8 +171,8 @@ class CategoryViewSet(ListCreateViewSet, DestroyViewSet):
     serializer_class = CategorySerializer
     permission_classes = [ReadOnly | IsAdmin]
     pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ("name",)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["name"]
     lookup_field = "slug"
 
 
@@ -181,19 +181,19 @@ class CommentViewSet(AllViewSet):
     отзыва с id=review_id, POST создаёт новый комментарий,
     GET, PATCH, DELETE для одного комментария по id отзыва с id=review_id."""
 
-    permission_classes = (
+    permission_classes = [
         IsAuthenticatedOrReadOnly,
         ReadOnly | IsAuthor | IsModerator | IsAdmin,
-    )
+    ]
     serializer_class = CommentSerializer
     pagination_class = PageNumberPagination
 
     def perform_create(self, serializer):
-        review_id = self.kwargs.get('review_id')
+        review_id = self.kwargs.get("review_id")
         review = get_object_or_404(Review, id=review_id)
         serializer.save(author=self.request.user, review=review)
 
     def get_queryset(self):
-        review_id = self.kwargs.get('review_id')
+        review_id = self.kwargs.get("review_id")
         review = get_object_or_404(Review, id=review_id)
         return review.comments.all()

@@ -1,6 +1,3 @@
-# Миграции будут сгенерированны перед пулом в ветку main
-migrations/
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

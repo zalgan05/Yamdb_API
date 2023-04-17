@@ -1,0 +1,432 @@
+{
+	"info": {
+		"_postman_id": "9468eb28-1233-4096-9d3f-58257d732504",
+		"name": "10-api-yamdb",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth required",
+			"item": [
+				{
+					"name": "Categories",
+					"item": [
+						{
+							"name": "Add Category",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\r\n    \"name\": \"книги\",\r\n    \"slug\": \"books\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/{{api_root}}/categories/",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"{{api_root}}",
+										"categories",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Users",
+					"item": [
+						{
+							"name": "Admin only",
+							"item": [
+								{
+									"name": "All Users",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{host}}/{{api_root}}/users/",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"{{api_root}}",
+												"users",
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add User",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"username\": \"{{$randomUserName}}\",\r\n  \"email\": \"{{$randomExampleEmail}}\",\r\n  \"first_name\": \"{{$randomFirstName}}\",\r\n  \"last_name\": \"{{$randomLastName}}\",\r\n  \"bio\": \"{{$randomLoremSentence}}\",\r\n  \"role\": \"user\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/{{api_root}}/users/",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"{{api_root}}",
+												"users",
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "User",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{host}}/{{api_root}}/users/Jacey.Collier88/",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"{{api_root}}",
+												"users",
+												"Jacey.Collier88",
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "User",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{host}}/{{api_root}}/users/Jacey.Collier88/",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"{{api_root}}",
+												"users",
+												"Jacey.Collier88",
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "User",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"email\": \"Felicia_Kerluke80@example.net\",\r\n    \"role\": \"user\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/{{api_root}}/users/Devyn75/",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"{{api_root}}",
+												"users",
+												"Devyn75",
+												""
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Get Me",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/{{api_root}}/users/me/",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"{{api_root}}",
+										"users",
+										"me",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{jwt_access_token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "auth/signup/",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"{{$randomUserName}}\",\r\n    \"email\": \"{{$randomExampleEmail}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/{{api_root}}/auth/signup/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"{{api_root}}",
+						"auth",
+						"signup",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth/token/",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"init auth token\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (\"token\" in jsonData) {\r",
+							"        pm.collectionVariables.set(\"jwt_access_token\", jsonData.token);\r",
+							"        console.log(jsonData.token);\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"Jacey.Collier88\",\r\n    \"confirmation_code\": \"c26fddb40536c608aa247eb1bf6f18b875cd96de\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/{{api_root}}/auth/token/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"{{api_root}}",
+						"auth",
+						"token",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth/token/ - admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"init auth token\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (\"token\" in jsonData) {\r",
+							"        pm.collectionVariables.set(\"jwt_access_token\", jsonData.token);\r",
+							"        console.log(jsonData.token);\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"admin\",\r\n    \"confirmation_code\": \"admin\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/{{api_root}}/auth/token/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"{{api_root}}",
+						"auth",
+						"token",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Categories",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/{{api_root}}/categories/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"{{api_root}}",
+						"categories",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Genres",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/{{api_root}}/categories/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"{{api_root}}",
+						"categories",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "http://127.0.0.1:8000",
+			"type": "default"
+		},
+		{
+			"key": "api_root",
+			"value": "api/v1",
+			"type": "default"
+		},
+		{
+			"key": "jwt_access_token",
+			"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjgzMTk1Njk1LCJpYXQiOjE2ODE0Njc2OTUsImp0aSI6IjM3NWE1NTA4ZDc3NjRhMDU5MGY1YWRiZTk2NzcxZjk4IiwidXNlcl9pZCI6OH0.GEXxJ_hT0uUo1HNNCUhRX8TzKbtjZrb6ATdKxBcBOPU",
+			"type": "default"
+		},
+		{
+			"value": "",
+			"disabled": true
+		}
+	]
+}
