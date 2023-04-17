@@ -44,6 +44,8 @@ class MixinEmail(serializers.Serializer):
 
 
 class MixinNames(serializers.Serializer):
+    """first_name, last_name fields"""
+
     first_name = serializers.CharField(
         max_length=NAMES_MAX_LEN, required=False
     )

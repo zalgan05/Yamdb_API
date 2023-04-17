@@ -44,6 +44,8 @@ User = get_user_model()
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def signup(request):
+    """Регистрация нового пользователя"""
+
     serializer = UserSignupSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user, _ = User.objects.get_or_create(
@@ -57,6 +59,8 @@ def signup(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def jwt_token(request):
+    """Получение JWT-токена"""
+
     serializer = TokenRequestSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)  # <- проверяет confirmation_code
     user = User.objects.get(username=serializer.data["username"])
@@ -65,6 +69,10 @@ def jwt_token(request):
 
 
 class UsersAdminViewSet(ListCreateViewSet):
+    """Возможность для админа:
+    1) GET: получить список всех пользователей
+    2) POST: создать нового пользователя, указав ему роль, отличную от USER"""
+
     permission_classes = (IsAdmin,)
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
@@ -74,6 +82,11 @@ class UsersAdminViewSet(ListCreateViewSet):
 
 
 class SingleUsersAdminViewSet(RetrievUpdateViewSet, DestroyViewSet):
+    """Возможность для админа:
+    1) GET: получить информацию о конкретном пользователе
+    2) PATCH: изменить в ней что-то
+    3) DELETE: удалить её"""
+
     permission_classes = (IsAdmin,)
     queryset = User.objects.all()
     serializer_class = UserUpdateSerializer
@@ -82,10 +95,14 @@ class SingleUsersAdminViewSet(RetrievUpdateViewSet, DestroyViewSet):
 
 
 class UserSelfViewSet(RetrievUpdateViewSet):
+    """Возможность для пользователя:
+    1) GET: получить информацию о своей учётке
+    2) PATCH: изменить в ней что-то"""
+
     permission_classes = (IsAuthenticated,)
     serializer_class = UserMeUpdateSerializer
-    lookup_field = "_"
-    lookup_value_regex = "me"
+    lookup_field = "_"  # мы не будем его использовать
+    lookup_value_regex = "me"  # `/users/me/`
 
     def get_object(self):
         return self.request.user
@@ -118,6 +135,10 @@ class ReviewViewSet(AllViewSet):
 
 
 class TitleViewSet(AllViewSet):
+    """Для произведений - полный набор стандартных методов (кроме PUT).
+    GET - доступен для анонимов
+    остальные методы - только администраторам"""
+
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     permission_classes = [ReadOnly | IsAdmin]
@@ -132,6 +153,8 @@ class TitleViewSet(AllViewSet):
 
 
 class GenreViewSet(ListCreateViewSet, DestroyViewSet):
+    """Для жанров - полный набор методов, кроме PATCH, PUT и GET-one."""
+
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [ReadOnly | IsAdmin]
@@ -142,6 +165,8 @@ class GenreViewSet(ListCreateViewSet, DestroyViewSet):
 
 
 class CategoryViewSet(ListCreateViewSet, DestroyViewSet):
+    """Для категорий - полный набор методов, кроме PATCH, PUT и GET-one."""
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [ReadOnly | IsAdmin]
