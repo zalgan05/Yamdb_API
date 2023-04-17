@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, serializers, viewsets
+from rest_framework import filters, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.pagination import (
     LimitOffsetPagination,
@@ -16,7 +16,12 @@ from rest_framework.response import Response
 
 from .filter import FilterTitles
 from .helpers_auth import get_jwt_token, send_signup_letter
-from .mixins import ListCreateDestroyViewSet
+from .mixins import (
+    ListCreateViewSet,
+    RetrievUpdateViewSet,
+    DestroyViewSet,
+    AllViewSet,
+)
 from .permissions import (
     IsAdmin,
     IsAuthor,
@@ -64,11 +69,7 @@ def jwt_token(request):
     return Response({"token": token})
 
 
-class UsersAdminViewSet(
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    viewsets.GenericViewSet,
-):
+class UsersAdminViewSet(ListCreateViewSet):
     permission_classes = (IsAdmin,)
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
@@ -77,26 +78,15 @@ class UsersAdminViewSet(
     search_fields = ("username",)
 
 
-class SingleUsersAdminViewSet(
-    mixins.UpdateModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet,
-):
+class SingleUsersAdminViewSet(RetrievUpdateViewSet, DestroyViewSet):
     permission_classes = (IsAdmin,)
     queryset = User.objects.all()
     serializer_class = UserUpdateSerializer
     lookup_field = "username"
     lookup_value_regex = r"[\w.@+-]+"
 
-    http_method_names = ['get', 'post', 'patch', 'delete']
 
-
-class UserSelfViewSet(
-    mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
-    viewsets.GenericViewSet,
-):
+class UserSelfViewSet(RetrievUpdateViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = UserMeUpdateSerializer
     lookup_field = "_"
@@ -106,7 +96,7 @@ class UserSelfViewSet(
         return self.request.user
 
 
-class ReviewViewSet(viewsets.ModelViewSet):
+class ReviewViewSet(AllViewSet):
     """Обрабатывает запросы GET для всех отзывов, POST - создаёт новый отзыв,
     GET, PATCH, DELETE для одного отзыва по id отзыва."""
 
@@ -116,7 +106,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         IsAuthenticatedOrReadOnly,
         ReadOnly | IsAuthor | IsModerator | IsAdmin,
     )
-    http_method_names = ['get', 'post', 'patch', 'delete']  # Убран метод PUT
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -133,7 +122,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, title=title)
 
 
-class TitleViewSet(viewsets.ModelViewSet):
+class TitleViewSet(AllViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     permission_classes = [ReadOnly | IsAdmin]
@@ -147,7 +136,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleSerializer
 
 
-class GenreViewSet(ListCreateDestroyViewSet):
+class GenreViewSet(ListCreateViewSet, DestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [ReadOnly | IsAdmin]
@@ -157,7 +146,7 @@ class GenreViewSet(ListCreateDestroyViewSet):
     lookup_field = "slug"
 
 
-class CategoryViewSet(ListCreateDestroyViewSet):
+class CategoryViewSet(ListCreateViewSet, DestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [ReadOnly | IsAdmin]
@@ -167,7 +156,7 @@ class CategoryViewSet(ListCreateDestroyViewSet):
     lookup_field = "slug"
 
 
-class CommentViewSet(viewsets.ModelViewSet):
+class CommentViewSet(AllViewSet):
     """Обрабатывает запросы GET для получения списка всех комментариев
     отзыва с id=review_id, POST создаёт новый комментарий,
     GET, PATCH, DELETE для одного комментария по id отзыва с id=review_id."""
