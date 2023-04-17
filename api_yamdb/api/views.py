@@ -41,7 +41,7 @@ from reviews.models import Category, Genre, Review, Title
 User = get_user_model()
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([AllowAny])
 def signup(request):
     """Регистрация нового пользователя"""
@@ -56,7 +56,7 @@ def signup(request):
     return Response(request.data)
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([AllowAny])
 def jwt_token(request):
     """Получение JWT-токена"""
@@ -120,16 +120,16 @@ class ReviewViewSet(AllViewSet):
     )
 
     def get_queryset(self):
-        title_id = self.kwargs.get('title_id')
+        title_id = self.kwargs.get("title_id")
         title = get_object_or_404(Title, id=title_id)
         return title.reviews.all()
 
     def perform_create(self, serializer):
-        title_id = self.kwargs.get('title_id')
+        title_id = self.kwargs.get("title_id")
         title = get_object_or_404(Title, id=title_id)
         if self.request.user.reviews.filter(title=title):
             raise serializers.ValidationError(
-                'Можно написать только один отзыв'
+                "Можно написать только один отзыв"
             )
         serializer.save(author=self.request.user, title=title)
 
@@ -147,7 +147,7 @@ class TitleViewSet(AllViewSet):
     filterset_class = FilterTitles
 
     def get_serializer_class(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ["list", "retrieve"]:
             return GetTitleSerializer
         return TitleSerializer
 
@@ -189,11 +189,11 @@ class CommentViewSet(AllViewSet):
     pagination_class = PageNumberPagination
 
     def perform_create(self, serializer):
-        review_id = self.kwargs.get('review_id')
+        review_id = self.kwargs.get("review_id")
         review = get_object_or_404(Review, id=review_id)
         serializer.save(author=self.request.user, review=review)
 
     def get_queryset(self):
-        review_id = self.kwargs.get('review_id')
+        review_id = self.kwargs.get("review_id")
         review = get_object_or_404(Review, id=review_id)
         return review.comments.all()

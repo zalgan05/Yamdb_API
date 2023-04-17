@@ -14,7 +14,7 @@ class RetrievUpdateViewSet(
     mixins.UpdateModelMixin,
     viewsets.GenericViewSet,
 ):
-    http_method_names = ['get', 'post', 'patch', 'delete']  # Убран метод PUT
+    http_method_names = ["get", "post", "patch", "delete"]  # Убран метод PUT
 
 
 class DestroyViewSet(mixins.DestroyModelMixin, viewsets.GenericViewSet):

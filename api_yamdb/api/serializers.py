@@ -24,7 +24,7 @@ class MixinUsernameRequired(serializers.Serializer):
     def validate_username(self, value):
         if value == "me":
             raise serializers.ValidationError(
-                "Нельзя выбрать \"me\" в качестве имени пользователя"
+                'Нельзя выбрать "me" в качестве имени пользователя'
             )  # в принципе, его и так нельзя будет выбрать, т.к. ограничение
             #    на длину не позволит
         return value
@@ -123,7 +123,7 @@ class UserMeUpdateSerializer(
             "bio",
             "role",
         ]
-        read_only_fields = ('role',)
+        read_only_fields = ("role",)
 
 
 class UserCreateSerializer(MixinNames, UserSignupSerializer):
@@ -143,13 +143,13 @@ class ReviewSerializer(serializers.ModelSerializer):
     """Преобразовывает объекты модели Review"""
 
     author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username'
+        read_only=True, slug_field="username"
     )
 
     class Meta:
         model = Review
-        exclude = ('title',)
-        read_only_fields = ('author',)
+        exclude = ("title",)
+        read_only_fields = ("author",)
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -214,10 +214,10 @@ class GetTitleSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username'
+        read_only=True, slug_field="username"
     )
 
     class Meta:
-        exclude = ('review',)
+        exclude = ("review",)
         model = Comment
-        read_only_fields = ('author',)
+        read_only_fields = ("author",)

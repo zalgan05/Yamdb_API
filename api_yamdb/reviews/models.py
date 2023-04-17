@@ -85,41 +85,41 @@ class Review(models.Model):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name='reviews',
+        related_name="reviews",
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='reviews',
+        related_name="reviews",
     )
     score = models.IntegerField(
-        'Оценка произведения',
+        "Оценка произведения",
         validators=[
             MaxValueValidator(10),
             MinValueValidator(1),
         ],
     )
-    pub_date = models.DateTimeField('Дата добавления', auto_now_add=True)
+    pub_date = models.DateTimeField("Дата добавления", auto_now_add=True)
 
     class Meta:
-        ordering = ('-pub_date',)  # Добавлено для корректной пагинации
+        ordering = ("-pub_date",)  # Добавлено для корректной пагинации
         constraints = [
             models.UniqueConstraint(
-                fields=['title', 'author'],  # Один пользователь - один отзыв
-                name='unique_review',
+                fields=["title", "author"],  # Один пользователь - один отзыв
+                name="unique_review",
             )
         ]
 
 
 class Comment(models.Model):
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='comments'
+        User, on_delete=models.CASCADE, related_name="comments"
     )
     review = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name='comments'
+        Review, on_delete=models.CASCADE, related_name="comments"
     )
     text = models.TextField()
-    pub_date = models.DateTimeField('Дата добавления', auto_now_add=True)
+    pub_date = models.DateTimeField("Дата добавления", auto_now_add=True)
 
     class Meta:
-        ordering = ('-pub_date',)
+        ordering = ("-pub_date",)
