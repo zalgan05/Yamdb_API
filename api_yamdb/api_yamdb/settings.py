@@ -2,13 +2,17 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs"
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+
+if DEBUG:
+    SECRET_KEY = "p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs"
+else:
+    SECRET_KEY = os.environ.get("SECRET_KEY", None)
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 ALLOWED_HOSTS = ["*"]
 
