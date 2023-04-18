@@ -1,41 +1,26 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, serializers
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.pagination import (
-    LimitOffsetPagination,
-    PageNumberPagination,
-)
-from rest_framework.permissions import (
-    AllowAny,
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
-)
+from rest_framework.pagination import (LimitOffsetPagination,
+                                       PageNumberPagination)
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
 from .filter import FilterTitles
 from .helpers_auth import get_jwt_token, send_signup_letter
-from .mixins.views import (
-    AllViewSet,
-    DestroyViewSet,
-    ListCreateViewSet,
-    RetrievUpdateViewSet,
-)
+from .mixins.views import (AllViewSet, DestroyViewSet, ListCreateViewSet,
+                           RetrievUpdateViewSet)
 from .permissions import IsAdmin, IsAuthor, IsModerator, ReadOnly
-from .serializers import (
-    CategorySerializer,
-    CommentSerializer,
-    GenreSerializer,
-    GetTitleSerializer,
-    ReviewSerializer,
-    TitleSerializer,
-    TokenRequestSerializer,
-    UserCreateSerializer,
-    UserMeUpdateSerializer,
-    UserSignupSerializer,
-    UserUpdateSerializer,
-)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, GetTitleSerializer,
+                          ReviewSerializer, TitleSerializer,
+                          TokenRequestSerializer, UserCreateSerializer,
+                          UserMeUpdateSerializer, UserSignupSerializer,
+                          UserUpdateSerializer)
 from reviews.models import Category, Genre, Review, Title
 
 User = get_user_model()
@@ -139,7 +124,7 @@ class TitleViewSet(AllViewSet):
     GET - доступен для анонимов
     остальные методы - только администраторам"""
 
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
     serializer_class = TitleSerializer
     permission_classes = [ReadOnly | IsAdmin]
     pagination_class = LimitOffsetPagination
