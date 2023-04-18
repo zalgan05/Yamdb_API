@@ -138,3 +138,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 5,
 }
+
+
+# определяет время жизни кода подтверждения (confirmation_code)
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 365  # (1 год в секундах)

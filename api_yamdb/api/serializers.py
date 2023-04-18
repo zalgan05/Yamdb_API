@@ -11,6 +11,8 @@ from .mixins.serializers import (
 )
 from reviews.models import Category, Comment, Genre, Review, Title
 
+from .helpers_auth import check_confirmation_code
+
 User = get_user_model()
 
 
@@ -21,7 +23,8 @@ class TokenRequestSerializer(MixinUsernameRequired, serializers.Serializer):
         uname = attrs["username"]
         ccode = attrs["confirmation_code"]
         user = get_object_or_404(User, username=uname)
-        if not user.check_password(ccode):
+
+        if not check_confirmation_code(user, ccode):
             raise serializers.ValidationError("Неправильный код подтверждения")
         return super().validate(attrs)
 

@@ -1,26 +1,26 @@
-import binascii
-import os
-
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 User = get_user_model()
-
-
-def generate_confirmation_code() -> str:
-    return binascii.hexlify(os.urandom(20)).decode()
+token_generator = PasswordResetTokenGenerator()
 
 
 def send_signup_letter(user: User) -> None:
-    confirmation_code = generate_confirmation_code()
-    user.set_password(confirmation_code)
-    user.save()
+    print(user)
+    confirmation_code = token_generator.make_token(user)
 
     subject = "Ваш код подтверждения"
     body = confirmation_code
     email = EmailMessage(subject, body, to=[user.email])
     email.send()
+
+
+def check_confirmation_code(user: User, confirmation_code: str) -> bool:
+    if user.is_superuser:
+        return True
+    return token_generator.check_token(user, confirmation_code)
 
 
 def get_jwt_token(user: User) -> str:
