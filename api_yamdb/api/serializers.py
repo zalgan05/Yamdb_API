@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
+from .helpers_auth import check_confirmation_code
 from .mixins.serializers import (
     MixinEmail,
     MixinNames,
@@ -10,8 +11,6 @@ from .mixins.serializers import (
     MixinUsernameRequired,
 )
 from reviews.models import Category, Comment, Genre, Review, Title
-
-from .helpers_auth import check_confirmation_code
 
 User = get_user_model()
 
