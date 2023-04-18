@@ -12,6 +12,11 @@ class User(AbstractUser):
         MODERATOR = "moderator"
         ADMIN = "admin"
 
+    email = models.EmailField(
+        "Адрес электронной почты",
+        unique=True,  # должен быть уникален
+    )
+
     bio = models.TextField(
         "Биография",
         blank=True,
