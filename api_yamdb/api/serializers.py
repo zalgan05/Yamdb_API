@@ -125,7 +125,7 @@ class TitleSerializer(serializers.ModelSerializer):
     category = SlugRelatedField(
         slug_field="slug", queryset=Category.objects.all()
     )
-    rating = serializers.FloatField(required=False)
+    rating = serializers.IntegerField(required=False)
 
     class Meta:
         fields = [
@@ -163,7 +163,7 @@ class GetTitleSerializer(serializers.ModelSerializer):
 
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
-    rating = serializers.FloatField(required=False)
+    rating = serializers.IntegerField(required=False)
 
     class Meta:
         fields = [
