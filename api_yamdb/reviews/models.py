@@ -12,16 +12,25 @@ class User(AbstractUser):
         MODERATOR = "moderator"
         ADMIN = "admin"
 
+    email = models.EmailField(
+        unique=True,  # должен быть уникален
+    )
+
     bio = models.TextField(
-        "Биография",
+        "биография",
         blank=True,
     )
     role = models.CharField(
-        "Пользовательская роль",
+        "роль",
         max_length=64,
         choices=Role.choices,
         default=Role.USER,
     )
+
+    class Meta:
+        verbose_name = "пользователь"
+        verbose_name_plural = "пользователи"
+        ordering = ["date_joined"]
 
 
 class Category(models.Model):

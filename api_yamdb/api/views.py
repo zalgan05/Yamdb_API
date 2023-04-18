@@ -16,7 +16,7 @@ from rest_framework.response import Response
 
 from .filter import FilterTitles
 from .helpers_auth import get_jwt_token, send_signup_letter
-from .mixins import (
+from .mixins.views import (
     AllViewSet,
     DestroyViewSet,
     ListCreateViewSet,
