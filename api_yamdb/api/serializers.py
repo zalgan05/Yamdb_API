@@ -125,6 +125,7 @@ class TitleSerializer(serializers.ModelSerializer):
     category = SlugRelatedField(
         slug_field="slug", queryset=Category.objects.all()
     )
+    rating = serializers.IntegerField(required=False)
 
     class Meta:
         fields = [
@@ -162,6 +163,7 @@ class GetTitleSerializer(serializers.ModelSerializer):
 
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
+    rating = serializers.IntegerField(required=False)
 
     class Meta:
         fields = [
@@ -174,6 +176,7 @@ class GetTitleSerializer(serializers.ModelSerializer):
             "category",
         ]  # порядок вывода, как в redoc
         model = Title
+        read_only_field = ['rating']
 
 
 class CommentSerializer(serializers.ModelSerializer):

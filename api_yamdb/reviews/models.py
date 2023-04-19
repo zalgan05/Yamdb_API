@@ -3,7 +3,6 @@ import datetime as dt
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import Avg
 
 
 class User(AbstractUser):
@@ -90,13 +89,6 @@ class Title(models.Model):
         verbose_name = "Произведение"
         verbose_name_plural = "Произведения"
         ordering = ["name"]
-
-    @property
-    def rating(self):
-        reviews = self.reviews
-        if not reviews:
-            return None
-        return reviews.aggregate(Avg("score"))["score__avg"]
 
     def __str__(self):
         return self.name
