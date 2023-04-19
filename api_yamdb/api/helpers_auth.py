@@ -8,7 +8,6 @@ token_generator = PasswordResetTokenGenerator()
 
 
 def send_signup_letter(user: User) -> None:
-    print(user)
     confirmation_code = token_generator.make_token(user)
 
     subject = "Ваш код подтверждения"
