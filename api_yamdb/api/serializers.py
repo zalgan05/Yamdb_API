@@ -176,7 +176,7 @@ class GetTitleSerializer(serializers.ModelSerializer):
             "category",
         ]  # порядок вывода, как в redoc
         model = Title
-        read_only_field = ['rating']
+        read_only_field = ["rating"]
 
 
 class CommentSerializer(serializers.ModelSerializer):
